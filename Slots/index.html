@@ -12,6 +12,19 @@
       }
     </style>
     <script>
+
+      // copied directly from proposal
+      
+      // Math.random() returns a random number between 0 and 1. range: [0, 1)
+      const WINRATE = 0.026; // P(A_match AND B_match)
+      // P(A_match AND B_match) = P(A_match) * P(B_match)
+      const INDIV_RATE = Math.sqrt(WINRATE);
+      // you can configure this manually as long as they multiply to A_match and B_match
+      const PROB_B_MATCH = INDIV_RATE;
+      const PROB_C_MATCH = INDIV_RATE;
+
+      // other constants
+
       const WIDTH = 1280;
       const HEIGHT = 720;
 
@@ -31,6 +44,8 @@
         // https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/23.png
         reelImages.push(loadImage("assets/1.png"));
         reelImages.push(loadImage("assets/2.png"));
+        reelImages.push(loadImage("assets/3.png"));
+        reelImages.push(loadImage("assets/4.png"));
         N = reelImages.length;
         console.log(N, " preloading");
       }
@@ -39,18 +54,22 @@
         for(let i = 0; i < N; i++){
           image(reelImages[i], x, y + i * DIM, DIM, DIM);
         }
+        noFill();
+        rect(x, y, DIM, DIM * N);
       }
 
       function calculateOffsetForStopAt(stopAt){
-        return ((center * DIM - stopAt * DIM) + HEIGHT) % HEIGHT;
+        const reelSectionHeight = N * DIM;
+        // where center is the index of the center
+        // where stopAt is the index of the stop
+        return ((center * DIM - stopAt * DIM) + reelSectionHeight) % reelSectionHeight;
       }
 
       function drawReel(posX, shiftY){
         const reelSectionHeight = N * DIM;
-        const screenY = shiftY % HEIGHT;
-        drawReelSection(posX, screenY - reelSectionHeight);
-        drawReelSection(posX, screenY);
-        drawReelSection(posX, screenY + reelSectionHeight);
+        for(let i = -2; i < 3; i ++){
+          drawReelSection(posX, shiftY + i * reelSectionHeight);
+        }
       }
 
       let slotMachine = {
@@ -60,13 +79,48 @@
         stopAt: [-1, -1, -1],
       };
 
+      function spinBackport(state) {
+        let ITEMS = [];
+        for(let i = 0; i < N; i++){
+          ITEMS.push(i);
+        }
+
+        // copy pasted directly from proposal
+        function spin(state = []){
+          if(state.length == 0){
+              // do not care about the first item
+              state.push(ITEMS[Math.floor(Math.random()*ITEMS.length)]);
+          }else if(state.length == 1){
+              if(Math.random() < PROB_B_MATCH){
+                  state.push(state[0]);
+              }else{
+                  const otherSymbols = ITEMS.filter(x => x != state[0]);
+                  state.push(otherSymbols[Math.floor(Math.random()*otherSymbols.length)]);
+              }
+          }else if(state.length == 2){
+              if(Math.random() < PROB_C_MATCH){
+                  state.push(state[0]);
+              }else{
+                  const otherSymbols = ITEMS.filter(x => x != state[0] && x != state[1]);
+                  state.push(otherSymbols[Math.floor(Math.random()*otherSymbols.length)]);
+              }
+          }
+          return state;
+        }
+
+        // yes we immediately
+        return spin(state);
+      }
+
       function doSpin(index, inc = 30) {
+        const reelSectionHeight = N * DIM;
         if(slotMachine.spinning[index]){
           if(slotMachine.stopAt[index] != -1){
             let beforeY = slotMachine.y[index];
-            let afterY = (slotMachine.y[index] + inc) % HEIGHT;
+            let afterY = (slotMachine.y[index] + inc) % reelSectionHeight;
             const targetY = calculateOffsetForStopAt(slotMachine.stopAt[index]);
             const hasCycled = afterY < beforeY;
+            console.log(targetY, beforeY, afterY, hasCycled);
             if(targetY == 0){
               if(hasCycled){
                 slotMachine.spinning[index] = false;
@@ -83,13 +137,27 @@
               }
             }
           }else{
-            let afterY = (slotMachine.y[index] + inc) % HEIGHT;
+            let afterY = (slotMachine.y[index] + inc) % reelSectionHeight;
             slotMachine.y[index] = afterY;
           }
         }
       }
 
+      function checkFinalized(){
+        return !slotMachine.spinning[0] && !slotMachine.spinning[1] && !slotMachine.spinning[2] && slotMachine.stopAt[0] != -1 && slotMachine.stopAt[1] != -1 && slotMachine.stopAt[2] != -1;
+      }
+
+      function checkWin(){
+        if(!checkFinalized()){
+          return false;
+        }
+        return slotMachine.stopAt[0] == slotMachine.stopAt[1] && slotMachine.stopAt[1] == slotMachine.stopAt[2];
+      }
+
+
       function draw(){
+        const reelSectionHeight = N * DIM;
+        console.log(N * DIM, N, DIM);
         background(255);
         drawReel(slotMachine.x[0], slotMachine.y[0]);
         drawReel(slotMachine.x[1], slotMachine.y[1]);
@@ -98,6 +166,25 @@
         doSpin(0);
         doSpin(1);
         doSpin(2);
+
+        // draw overlay
+        if(checkFinalized()){
+          const won = checkWin();
+          // draw overlay box
+          fill(0, 0, 0, 200);
+          rect(0, HEIGHT / 3, WIDTH, HEIGHT / 3);
+          textAlign(CENTER, CENTER);
+          if(won){
+            fill("green");
+            textSize(200);
+            text("You won!", WIDTH / 2, HEIGHT / 2);
+          }else{
+            fill("red");
+            textSize(200);
+            text("You lost!", WIDTH / 2, HEIGHT / 2);
+          }
+          console.log("won", won);
+        }
       }
       console.log(slotMachine.spinning);
 
@@ -113,13 +200,15 @@
           // console.log(slotMachine.spinning);
         }else if(slotMachine.spinning[0]){
           console.log("stop 0");
-          slotMachine.stopAt[0] = Math.floor(Math.random() * N);
+          slotMachine.stopAt[0] = spinBackport([])[0];
         }else if(slotMachine.spinning[1]){
           console.log("stop 1");
-          slotMachine.stopAt[1] = Math.floor(Math.random() * N);
+          // TODO: edit with prob functions
+          slotMachine.stopAt[1] = spinBackport([slotMachine.stopAt[0]])[1];
         }else if(slotMachine.spinning[2]){
+          // TODO: edit with prob functions
           console.log("stop 2");
-          slotMachine.stopAt[2] = Math.floor(Math.random() * N);
+          slotMachine.stopAt[2] = spinBackport([slotMachine.stopAt[0], slotMachine.stopAt[1]])[2];
         }
       }
 
