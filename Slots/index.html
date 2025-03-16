@@ -2,8 +2,135 @@
 <html>
   <head>
     <title>Slot Machine</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.3/lib/p5.min.js"></script>
+    <meta charset="utf-8">
   </head>
   <body>
-    <h1>TODO</h1>
+    <style>
+      canvas {
+        border: black 1px solid;
+      }
+    </style>
+    <script>
+      const WIDTH = 1280;
+      const HEIGHT = 720;
+
+      let reelImages = [];
+      let N = 0;
+      let DIM = 240;
+      let center = 1;
+      
+      function setup(){
+        console.log("Setup");
+        createCanvas(WIDTH, HEIGHT);
+      }
+
+      function preload(){
+        console.log("Preloading");
+        // e.g. how to pull assets
+        // https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/23.png
+        reelImages.push(loadImage("assets/1.png"));
+        reelImages.push(loadImage("assets/2.png"));
+        N = reelImages.length;
+        console.log(N, " preloading");
+      }
+
+      function drawReelSection(x, y){
+        for(let i = 0; i < N; i++){
+          image(reelImages[i], x, y + i * DIM, DIM, DIM);
+        }
+      }
+
+      function calculateOffsetForStopAt(stopAt){
+        return ((center * DIM - stopAt * DIM) + HEIGHT) % HEIGHT;
+      }
+
+      function drawReel(posX, shiftY){
+        const reelSectionHeight = N * DIM;
+        const screenY = shiftY % HEIGHT;
+        drawReelSection(posX, screenY - reelSectionHeight);
+        drawReelSection(posX, screenY);
+        drawReelSection(posX, screenY + reelSectionHeight);
+      }
+
+      let slotMachine = {
+        y: [0, 0, 0],
+        x: [0, 420, 840],
+        spinning: [false, false, false],
+        stopAt: [-1, -1, -1],
+      };
+
+      function doSpin(index, inc = 30) {
+        if(slotMachine.spinning[index]){
+          if(slotMachine.stopAt[index] != -1){
+            let beforeY = slotMachine.y[index];
+            let afterY = (slotMachine.y[index] + inc) % HEIGHT;
+            const targetY = calculateOffsetForStopAt(slotMachine.stopAt[index]);
+            const hasCycled = afterY < beforeY;
+            if(targetY == 0){
+              if(hasCycled){
+                slotMachine.spinning[index] = false;
+                slotMachine.y[index] = 0;
+              }else{
+                slotMachine.y[index] = afterY;
+              }
+            }else{
+              if(beforeY < targetY && afterY >= targetY){
+                slotMachine.spinning[index] = false;
+                slotMachine.y[index] = targetY;
+              }else{
+                slotMachine.y[index] = afterY;
+              }
+            }
+          }else{
+            let afterY = (slotMachine.y[index] + inc) % HEIGHT;
+            slotMachine.y[index] = afterY;
+          }
+        }
+      }
+
+      function draw(){
+        background(255);
+        drawReel(slotMachine.x[0], slotMachine.y[0]);
+        drawReel(slotMachine.x[1], slotMachine.y[1]);
+        drawReel(slotMachine.x[2], slotMachine.y[2]);
+
+        doSpin(0);
+        doSpin(1);
+        doSpin(2);
+      }
+      console.log(slotMachine.spinning);
+
+      function doRoll(){
+        if(!slotMachine.spinning[0] && !slotMachine.spinning[1] && !slotMachine.spinning[2]){
+          console.log("full rolling");
+          slotMachine.stopAt[0] = -1;
+          slotMachine.stopAt[1] = -1;
+          slotMachine.stopAt[2] = -1;
+          slotMachine.spinning[0] = true;
+          slotMachine.spinning[1] = true;
+          slotMachine.spinning[2] = true;
+          // console.log(slotMachine.spinning);
+        }else if(slotMachine.spinning[0]){
+          console.log("stop 0");
+          slotMachine.stopAt[0] = Math.floor(Math.random() * N);
+        }else if(slotMachine.spinning[1]){
+          console.log("stop 1");
+          slotMachine.stopAt[1] = Math.floor(Math.random() * N);
+        }else if(slotMachine.spinning[2]){
+          console.log("stop 2");
+          slotMachine.stopAt[2] = Math.floor(Math.random() * N);
+        }
+      }
+
+      function keyPressed(){
+        if(key === " "){
+          console.log("rolling");
+          doRoll();
+        }
+      }
+
+    </script>
+    some image copyright belongs to pokemon company
   </body>
 </html>

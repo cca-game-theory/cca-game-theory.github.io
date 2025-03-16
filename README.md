@@ -1,0 +1,1 @@
+some image copyright belongs to pokemon company
