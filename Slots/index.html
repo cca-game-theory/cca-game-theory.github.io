@@ -42,10 +42,33 @@
         console.log("Preloading");
         // e.g. how to pull assets
         // https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/23.png
+        // or go to https://www.pokemon.com/us/pokedex and copy image
+        // just keep appending here and stuff will like auto recalculate
         reelImages.push(loadImage("assets/1.png"));
         reelImages.push(loadImage("assets/2.png"));
         reelImages.push(loadImage("assets/3.png"));
         reelImages.push(loadImage("assets/4.png"));
+        reelImages.push(loadImage("assets/5.png"));
+        reelImages.push(loadImage("assets/6.png"));
+        reelImages.push(loadImage("assets/7.png"));
+        reelImages.push(loadImage("assets/8.png"));
+        reelImages.push(loadImage("assets/9.png"));
+        if(Math.random() < 0.1){
+          // im too lazy to make this more secretive
+          // ditto easter egg, does not affect probs
+          reelImages.push(loadImage("assets/10.png"));
+        }
+        reelImages.push(loadImage("assets/11.png"));
+        reelImages.push(loadImage("assets/12.png"));
+        reelImages.push(loadImage("assets/13.png"));
+        reelImages.push(loadImage("assets/14.png"));
+        reelImages.push(loadImage("assets/15.png"));
+        reelImages.push(loadImage("assets/16.png"));
+        reelImages.push(loadImage("assets/17.png"));
+        reelImages.push(loadImage("assets/18.png"));
+        reelImages.push(loadImage("assets/19.png"));
+        reelImages.push(loadImage("assets/20.png"));
+
         N = reelImages.length;
         console.log(N, " preloading");
       }
