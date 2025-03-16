@@ -222,14 +222,14 @@
           slotMachine.spinning[1] = true;
           slotMachine.spinning[2] = true;
           // console.log(slotMachine.spinning);
-        }else if(slotMachine.spinning[0]){
+        }else if(slotMachine.spinning[0] && slotMachine.stopAt[0] == -1){
           console.log("stop 0");
           slotMachine.stopAt[0] = spinBackport([])[0];
-        }else if(slotMachine.spinning[1]){
+        }else if(slotMachine.spinning[1] && slotMachine.stopAt[1] == -1){
           console.log("stop 1");
           // TODO: edit with prob functions
           slotMachine.stopAt[1] = spinBackport([slotMachine.stopAt[0]])[1];
-        }else if(slotMachine.spinning[2]){
+        }else if(slotMachine.spinning[2] && slotMachine.stopAt[2] == -1){
           // TODO: edit with prob functions
           console.log("stop 2");
           slotMachine.stopAt[2] = spinBackport([slotMachine.stopAt[0], slotMachine.stopAt[1]])[2];
