@@ -13,18 +13,20 @@ function sleep(ms) {
     });
     /** @type {Page[]} */
     const tabs = await Promise.all((new Array(CONCURRENT)).fill(0).map(() => browser.newPage()));
+    const results = await Promise.all(tabs.map(async (tab, index) => {
+        await tab.goto(`http://localhost:6969/Slots/`);
+        await tab.waitForSelector("canvas");
+        await sleep(1000);
+    }));
     let allResults = [];
     for(let i = 0; i < times; i ++){
         const results = await Promise.all(tabs.map(async (tab, index) => {
-            await tab.goto(`http://localhost:6969/Slots/index.html`);
-            await tab.waitForSelector("canvas");
             
             // await tab.screenshot({path: `./run/media/raymond/Data/Coding/cca-game-theory.github.io/screenshots/${i}_${index}.png`});
             // await tab.waitFor(1000);
             const randomWaitMs1 = Math.floor(Math.random() * 1000);
             const randomWaitMs2 = Math.floor(Math.random() * 1000);
             const randomWaitMs3 = Math.floor(Math.random() * 1000);
-            await sleep(1000);
             await tab.keyboard.press("Enter");
             await sleep(randomWaitMs1);
             await tab.keyboard.press("Space");

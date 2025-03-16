@@ -20,8 +20,8 @@
       // P(A_match AND B_match) = P(A_match) * P(B_match)
       const INDIV_RATE = Math.sqrt(WINRATE);
       // you can configure this manually as long as they multiply to A_match and B_match
-      const PROB_B_MATCH = INDIV_RATE;
-      const PROB_C_MATCH = INDIV_RATE;
+      const PROB_B_MATCH = 0.60; // ethan wanted this but math still maths
+      const PROB_C_MATCH = WINRATE / PROB_B_MATCH;
 
       // other constants
 
