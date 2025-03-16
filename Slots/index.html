@@ -212,8 +212,8 @@
       }
       console.log(slotMachine.spinning);
 
-      function doRoll(){
-        if(!slotMachine.spinning[0] && !slotMachine.spinning[1] && !slotMachine.spinning[2]){
+      function doRoll(allowFullRoll = true){
+        if(!slotMachine.spinning[0] && !slotMachine.spinning[1] && !slotMachine.spinning[2] && allowFullRoll){
           console.log("full rolling");
           slotMachine.stopAt[0] = -1;
           slotMachine.stopAt[1] = -1;
@@ -239,6 +239,9 @@
       function keyPressed(){
         if(key === " "){
           console.log("rolling");
+          doRoll(false);
+        }
+        if(keyCode === ENTER){
           doRoll();
         }
       }
