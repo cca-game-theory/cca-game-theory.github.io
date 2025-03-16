@@ -36,6 +36,7 @@
       function setup(){
         console.log("Setup");
         createCanvas(WIDTH, HEIGHT);
+        frameRate(60);
       }
 
       function preload(){
@@ -135,7 +136,7 @@
         return spin(state);
       }
 
-      function doSpin(index, inc = 30) {
+      function doSpin(index, inc = 120) {
         const reelSectionHeight = N * DIM;
         if(slotMachine.spinning[index]){
           if(slotMachine.stopAt[index] != -1){
