@@ -37,6 +37,7 @@
         console.log("Setup");
         createCanvas(WIDTH, HEIGHT);
         frameRate(60);
+        textFont("Arial");
       }
 
       function preload(){
@@ -79,7 +80,7 @@
           image(reelImages[i], x, y + i * DIM, DIM, DIM);
         }
         noFill();
-        rect(x, y, DIM, DIM * N);
+        // rect(x, y, DIM, DIM * N);
       }
 
       function calculateOffsetForStopAt(stopAt){
@@ -182,7 +183,7 @@
       function draw(){
         const reelSectionHeight = N * DIM;
         console.log(N * DIM, N, DIM);
-        background(255);
+        background("#1C2333");
         drawReel(slotMachine.x[0], slotMachine.y[0]);
         drawReel(slotMachine.x[1], slotMachine.y[1]);
         drawReel(slotMachine.x[2], slotMachine.y[2]);
