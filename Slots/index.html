@@ -76,12 +76,10 @@
       }
 
       function drawReelSection(x, y){
-        fill("white");
-        rect(x, y, DIM, DIM * N);
         for(let i = 0; i < N; i++){
           image(reelImages[i], x, y + i * DIM, DIM, DIM);
         }
-        
+        noFill();
       }
 
       function calculateOffsetForStopAt(stopAt){
