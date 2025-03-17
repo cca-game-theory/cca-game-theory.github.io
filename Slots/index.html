@@ -245,10 +245,24 @@
         if(keyCode === ENTER){
           doRoll();
         }
+        if(key == "r"){
+          quickRoll();
+        }
+      }
+
+      function quickRoll(){
+        if(!slotMachine.spinning[0] && !slotMachine.spinning[1] && !slotMachine.spinning[2]){
+          slotMachine.spinning[0] = true;
+          slotMachine.spinning[1] = true;
+          slotMachine.spinning[2] = true;
+          slotMachine.stopAt[0] = spinBackport([])[0];
+          slotMachine.stopAt[1] = spinBackport([slotMachine.stopAt[0]])[1];
+          slotMachine.stopAt[2] = spinBackport([slotMachine.stopAt[0], slotMachine.stopAt[1]])[2];
+        }
       }
 
       function doubleClicked(){
-        doRoll();
+        quickRoll();
       }
 
       function touchStarted(){
